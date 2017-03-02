@@ -9,6 +9,8 @@ datasets_home = os.environ['DATASETS'] + '/vehicles'
 img_rows = 640
 img_cols = 960
 
+img_size = (img_rows, img_cols)
+
 dir_label = [datasets_home + '/object-dataset',
              datasets_home + '/object-detection-crowdai']
 
