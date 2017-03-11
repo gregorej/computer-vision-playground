@@ -5,6 +5,19 @@
 import argparse
 import cv2
 
+event_loop_listeners = []
+
+
+def start_event_loop():
+    while True:
+        key = cv2.waitKey(1) & 0xFF
+        for listener in event_loop_listeners:
+            listener(key)
+
+
+def add_event_loop_listener(listener):
+    event_loop_listeners.append(listener)
+
 
 class Cropper(object):
     def __init__(self, window_name):
@@ -26,22 +39,22 @@ class Cropper(object):
     def start(self, image):
         self.__image = image
         cv2.namedWindow(self.__windowName)
-        cv2.setMouseCallback(self.__windowName, lambda event, x, y, req, param : self.__click_and_crop(event, x, y))
-        while True:
-            # display the image and wait for a keypress
-            self.__refresh_image()
-            key = cv2.waitKey(1) & 0xFF
+        cv2.setMouseCallback(self.__windowName, lambda event, x, y, req, param: self.__click_and_crop(event, x, y))
+        add_event_loop_listener(lambda key: self.__key_listener(key))
 
-            # if the 'r' key is pressed, reset the cropping region
-            if key == ord("r"):
-                self.__currentCrop = None
-                self.__startPoint = None
+    def __key_listener(self, key):
+        self.__refresh_image()
 
-            # if the 'c' key is pressed, break from the loop
-            elif key == ord("c"):
-                if self.__currentCrop is not None:
-                    self.__onCrop(self.__currentCrop)
-                    self.__reset()
+        # if the 'r' key is pressed, reset the cropping region
+        if key == ord("r"):
+            self.__currentCrop = None
+            self.__startPoint = None
+
+        # if the 'c' key is pressed, break from the loop
+        elif key == ord("c"):
+            if self.__currentCrop is not None:
+                self.__onCrop(self.__currentCrop)
+                self.__reset()
 
     def __click_and_crop(self, event, x, y):
         # if the left mouse button was clicked, record the starting
@@ -90,8 +103,9 @@ if __name__ == "__main__":
     image = cv2.imread(args["image"])
     cropper = Cropper("image")
     cropper.on_crop(display_crop)
-
     cropper.start(image)
+
+    start_event_loop()
 
     # close all open windows
     cv2.destroyAllWindows()
