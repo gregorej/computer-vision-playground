@@ -34,8 +34,10 @@ def plot_bbox(bb_boxes,ind_bb,color='r',linewidth=2):
              color, linewidth=linewidth)
 
 
-def plot_im_bbox(im,bb_boxes):
+def plot_im_bbox(sample):
     # Plot image and bounding box
+    im = sample.image
+    bb_boxes = sample.bb_boxes
     plt.imshow(im)
     for i in range(len(bb_boxes)):
         plot_bbox(bb_boxes,i,'g')

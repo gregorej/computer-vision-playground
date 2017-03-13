@@ -5,34 +5,34 @@ import numpy as np
 def augment_brightness_camera_images(image):
 
     ### Augment brightness
-    image1 = cv2.cvtColor(image,cv2.COLOR_RGB2HSV)
+    image1 = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     random_bright = .25+np.random.uniform()
     #print(random_bright)
-    image1[:,:,2] = image1[:,:,2]*random_bright
-    image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
+    image1[:, :, 2] = image1[:, :, 2]*random_bright
+    image1 = cv2.cvtColor(image1, cv2.COLOR_HSV2RGB)
     return image1
 
 
-def trans_image(image,bb_boxes_f,trans_range):
+def trans_image(image, bb_boxes_f, trans_range):
     # Translation augmentation
     bb_boxes_f = bb_boxes_f.copy(deep=True)
 
     tr_x = trans_range*np.random.uniform()-trans_range/2
     tr_y = trans_range*np.random.uniform()-trans_range/2
 
-    Trans_M = np.float32([[1,0,tr_x],[0,1,tr_y]])
-    rows,cols,channels = image.shape
-    bb_boxes_f['xmin'] = bb_boxes_f['xmin']+tr_x
-    bb_boxes_f['xmax'] = bb_boxes_f['xmax']+tr_x
-    bb_boxes_f['ymin'] = bb_boxes_f['ymin']+tr_y
-    bb_boxes_f['ymax'] = bb_boxes_f['ymax']+tr_y
+    trans_m = np.float32([[1, 0, tr_x], [0, 1, tr_y]])
+    rows, cols, channels = image.shape
+    bb_boxes_f['xmin'] += tr_x
+    bb_boxes_f['xmax'] += tr_x
+    bb_boxes_f['ymin'] += tr_y
+    bb_boxes_f['ymax'] += tr_y
 
-    image_tr = cv2.warpAffine(image,Trans_M,(cols,rows))
+    image_tr = cv2.warpAffine(image, trans_m, (cols, rows))
 
-    return image_tr,bb_boxes_f
+    return image_tr, bb_boxes_f
 
 
-def stretch_image(img,bb_boxes_f,scale_range):
+def stretch_image(img, bb_boxes_f, scale_range):
     # Stretching augmentation
 
     bb_boxes_f = bb_boxes_f.copy(deep=True)
@@ -57,27 +57,14 @@ def stretch_image(img,bb_boxes_f,scale_range):
                        [0,img.shape[0]] ]
                       )
 
-    M = cv2.getPerspectiveTransform(pts1,pts2)
-    img = cv2.warpPerspective(img,M,(img.shape[1],img.shape[0]))
-    img = np.array(img,dtype=np.uint8)
+    m = cv2.getPerspectiveTransform(pts1,pts2)
+    img = cv2.warpPerspective(img, m, (img.shape[1], img.shape[0]))
+    img = np.array(img, dtype=np.uint8)
 
     bb_boxes_f['xmin'] = (bb_boxes_f['xmin'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
     bb_boxes_f['xmax'] = (bb_boxes_f['xmax'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
     bb_boxes_f['ymin'] = (bb_boxes_f['ymin'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
     bb_boxes_f['ymax'] = (bb_boxes_f['ymax'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
 
-    return img,bb_boxes_f
+    return img, bb_boxes_f
 
-
-def get_mask_seg(img,bb_boxes_f):
-
-    # Get mask
-
-    img_mask = np.zeros_like(img[:,:,0])
-    for i in range(len(bb_boxes_f)):
-        #plot_bbox(bb_boxes,i,'g')
-        bb_box_i = [bb_boxes_f.iloc[i]['xmin'],bb_boxes_f.iloc[i]['ymin'],
-                    bb_boxes_f.iloc[i]['xmax'],bb_boxes_f.iloc[i]['ymax']]
-        img_mask[bb_box_i[1]:bb_box_i[3],bb_box_i[0]:bb_box_i[2]]= 1.
-        img_mask = np.reshape(img_mask,(np.shape(img_mask)[0],np.shape(img_mask)[1],1))
-    return img_mask

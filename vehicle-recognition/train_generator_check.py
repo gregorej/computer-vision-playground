@@ -4,18 +4,18 @@ import numpy as np
 import cv2
 
 training_gen = ds.generate_train_batch(10)
-batch_img,batch_mask = next(training_gen)
+batch_img, batch_mask = next(training_gen)
 ### Plotting generator output
 for i in range(10):
-    im = np.array(batch_img[i],dtype=np.uint8)
-    im_mask = np.array(batch_mask[i],dtype=np.uint8)
-    plt.subplot(1,3,1)
+    im = np.array(batch_img[i], dtype=np.uint8)
+    im_mask = np.array(batch_mask[i], dtype=np.uint8)
+    plt.subplot(1, 3, 1)
     plt.imshow(im)
     plt.axis('off')
-    plt.subplot(1,3,2)
-    plt.imshow(im_mask[:,:,0])
+    plt.subplot(1, 3, 2)
+    plt.imshow(im_mask[:, :, 0])
     plt.axis('off')
-    plt.subplot(1,3,3)
-    plt.imshow(cv2.bitwise_and(im,im,mask=im_mask));
+    plt.subplot(1, 3, 3)
+    plt.imshow(cv2.bitwise_and(im, im, mask=im_mask))
     plt.axis('off')
-    plt.show();
+    plt.show()

@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import cv2
-from augmentation import trans_image, stretch_image, augment_brightness_camera_images, get_mask_seg
+from augmentation import augment_brightness_camera_images
 import os
+from data_sample import DataSample
 
 datasets_home = os.environ['DATASETS'] + '/vehicles'
 # Image size,
@@ -45,14 +46,13 @@ def generate_train_batch(batch_size=32):
     while 1:
         for i_batch in range(batch_size):
             i_line = np.random.randint(len(data) - 2000)
-            name_str, img, bb_boxes = get_image_by_name(i_line,
-                                                        size=(img_cols, img_rows),
-                                                        augmentation=True,
-                                                        trans_range=50,
-                                                        scale_range=50
-                                                        )
-            img_mask = get_mask_seg(img, bb_boxes)
-            batch_images[i_batch] = img
+            sample = get_sample_by_index(i_line)
+            sample.resize((img_cols, img_rows))
+            # sample.translate(50)
+            # sample.stretch(50)
+            sample.image = augment_brightness_camera_images(sample.image)
+            img_mask = sample.merged_mask()
+            batch_images[i_batch] = sample.image
             batch_masks[i_batch] = img_mask
         yield batch_images, batch_masks
 
@@ -66,46 +66,25 @@ def generate_test_batch(batch_size=32):
         for i_batch in range(batch_size):
             i_line = np.random.randint(2000)
             i_line = i_line + len(data) - 2000
-            name_str, img, bb_boxes = get_image_by_name(i_line,
-                                                        size=(img_cols, img_rows),
-                                                        augmentation=False,
-                                                        trans_range=0,
-                                                        scale_range=0
-                                                        )
-            img_mask = get_mask_seg(img, bb_boxes)
-            batch_images[i_batch] = img
+            sample = get_sample_by_index(i_line)
+            sample.resize((img_cols, img_rows))
+            img_mask = sample.merged_mask()
+            batch_images[i_batch] = sample.image
             batch_masks[i_batch] = img_mask
         yield batch_images, batch_masks
 
 
-def get_image_by_name(ind, size=(640, 300), augmentation=False, trans_range=20, scale_range=20):
+def get_sample_by_index(index):
     # Get image by name
 
     df = vehicles
-    file_name = df['File_Path'][ind]
+    file_name = df['File_Path'][index]
     img = cv2.imread(file_name)
-    img_size = np.shape(img)
-
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, size)
     name_str = file_name.split('/')
     name_str = name_str[-1]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     bb_boxes = df[df['Frame'] == name_str].reset_index()
-    img_size_post = np.shape(img)
-
-    if augmentation:
-        img, bb_boxes = trans_image(img, bb_boxes, trans_range)
-        img, bb_boxes = stretch_image(img, bb_boxes, scale_range)
-        img = augment_brightness_camera_images(img)
-
-    bb_boxes['xmin'] = np.round(bb_boxes['xmin'] / img_size[1] * img_size_post[1])
-    bb_boxes['xmax'] = np.round(bb_boxes['xmax'] / img_size[1] * img_size_post[1])
-    bb_boxes['ymin'] = np.round(bb_boxes['ymin'] / img_size[0] * img_size_post[0])
-    bb_boxes['ymax'] = np.round(bb_boxes['ymax'] / img_size[0] * img_size_post[0])
-    bb_boxes['Area'] = (bb_boxes['xmax'] - bb_boxes['xmin']) * (bb_boxes['ymax'] - bb_boxes['ymin'])
-
-    return name_str, img, bb_boxes
-
+    return DataSample(img, bb_boxes)
 
 if __name__ == '__main__':
     print vehicles.head()
