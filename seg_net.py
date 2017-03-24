@@ -54,20 +54,20 @@ class CamVidDataset(object):
 
     class Generator(object):
 
-        def __init__(self, owner, batch_size):
+        def __init__(self, dataset, batch_size):
             self.__current_index = 0
-            self.owner = owner
+            self.ds = dataset
             self.batch_size = batch_size
 
         def next(self):
-            img_size = self.owner.img_size
-            if self.__current_index >= self.owner.size:
+            img_size = self.ds.img_size
+            if self.__current_index >= self.ds.size:
                 self.__current_index = 0
-            actual_batch_size = min(self.batch_size, self.owner.size - self.__current_index)
+            actual_batch_size = min(self.batch_size, self.ds.size - self.__current_index)
             image_data = np.zeros((actual_batch_size, img_size[0], img_size[1], 3), dtype='uint8')
             label_data = np.zeros((actual_batch_size, img_size[0], img_size[1]), dtype='uint8')
-            for idx in range(0, actual_batch_size):
-                image, labels = self.owner[self.__current_index + idx]
+            for idx in range(actual_batch_size):
+                image, labels = self.ds[self.__current_index + idx]
                 label_data[idx] = labels
                 image_data[idx] = image
             self.__current_index += actual_batch_size
@@ -80,22 +80,20 @@ class CamVidDataset(object):
 
         def __init__(self, owner):
             self.__current_index = 0
-            self.owner = owner
+            self.ds = owner
 
         def next(self):
-            if self.__current_index >= self.owner.size:
+            if self.__current_index >= self.ds.size:
                 raise StopIteration
-            result = self.owner[self.__current_index]
+            result = self.ds[self.__current_index]
             self.__current_index += 1
             return result
 
     def __init__(self, image_files, label_files, dataset_home):
         self._images_dir = dataset_home + '/701_StillsRaw_full'
         self._images = image_files
-        self._images.sort()
         self._labels_dir = dataset_home + '/LabeledApproved_full'
         self._labels = label_files
-        self._labels.sort()
         self._dataset_home = dataset_home
         self.size = len(self._images)
 
@@ -104,8 +102,11 @@ class CamVidDataset(object):
         datasets_home = os.environ['DATASETS'] + '/camvid'
         images_dir = datasets_home + '/701_StillsRaw_full'
         labels_dir = datasets_home + '/LabeledApproved_full'
-        return CamVidDataset([f for f in os.listdir(images_dir) if f.endswith('.png')],
-                             [f for f in os.listdir(labels_dir) if f.endswith('.png')], datasets_home)
+        image_files = [f for f in os.listdir(images_dir) if f.endswith('.png')]
+        image_files.sort()
+        label_files = [f for f in os.listdir(labels_dir) if f.endswith('.png')]
+        label_files.sort()
+        return CamVidDataset(image_files, label_files, datasets_home)
 
     def __len__(self):
         return self.size
@@ -116,7 +117,7 @@ class CamVidDataset(object):
     def __getitem__(self, item):
         if isinstance(item, slice):
             return CamVidDataset(self._images[item], self._labels[item], self._dataset_home)
-        if isinstance(item, int) and 0 <= item < self.size:
+        elif isinstance(item, int) and 0 <= item < self.size:
             full_image_path = os.path.join(self._images_dir, self._images[item])
             image = cv2.imread(full_image_path)
             full_label_path = os.path.join(self._labels_dir, self._labels[item])
@@ -128,10 +129,10 @@ class CamVidDataset(object):
     def generator(self, batch_size=10):
         return self.Generator(self, batch_size)
 
-camvid = CamVidDataset.from_dir()[0:-100]
+camvid = CamVidDataset.from_dir()
 model = seg_net(camvid.img_size)
 left_for_test = 1
-model.compile(loss='mean_squared_error', optimizer='sgd')
+model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 model.fit_generator(camvid.generator(),
                     nb_epoch=1,
                     samples_per_epoch=len(camvid))
