@@ -7,9 +7,12 @@ from CamVidDataset import CamVidDataset
 
 def seg_net(img_size, categories_count):
     reduction_size = (2, 2)
+    filter_size = 64
 
-    def add_encoding_part(model):
-        model.add(Convolution2D(1, 3, 3, border_mode='same'))
+    def add_encoding_part(model, index):
+        actual_filter_size = filter_size * (2 ** index)
+        print actual_filter_size
+        model.add(Convolution2D(actual_filter_size, 3, 3, border_mode='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         model.add(MaxPooling2D(reduction_size))
@@ -17,9 +20,11 @@ def seg_net(img_size, categories_count):
 
     def add_decoding_part(model, index=0):
         model.add(UpSampling2D(reduction_size))
-        if index == 2:
+        if index == 1:
             model.add(ZeroPadding2D(padding=(1, 0)))
-        model.add(Convolution2D(1, 3, 3, border_mode='same'))
+        actual_filter_size = filter_size * (2 ** (3 - index))
+        print actual_filter_size
+        model.add(Convolution2D(actual_filter_size, 3, 3, border_mode='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         print model.output_shape
@@ -27,18 +32,18 @@ def seg_net(img_size, categories_count):
     model = Sequential()
 
     model.add(InputLayer(input_shape=(img_size[0], img_size[1], 3)))
-    add_encoding_part(model)
-    add_encoding_part(model)
-    add_encoding_part(model)
-    add_encoding_part(model)
-    add_encoding_part(model)
+    add_encoding_part(model, 0)
+    add_encoding_part(model, 1)
+    add_encoding_part(model, 2)
+    add_encoding_part(model, 3)
+    #add_encoding_part(model, 4)
 
     # upsampling phase
     add_decoding_part(model, 0)
     add_decoding_part(model, 1)
     add_decoding_part(model, 2)
     add_decoding_part(model, 3)
-    add_decoding_part(model, 4)
+    #add_decoding_part(model, 4)
 
     model.add(Convolution2D(categories_count, 1, 1, border_mode='valid',))
     model.add(Reshape((img_size[0] * img_size[1], categories_count)))
@@ -52,11 +57,14 @@ camvid = CamVidDataset.from_dir()
 model = seg_net(camvid.img_size, camvid.categories_count)
 left_for_test = 1
 model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
-model.fit_generator(camvid.generator(),
-                    nb_epoch=1,
-                    samples_per_epoch=len(camvid))
+test_set = camvid[0:-100]
+model.fit_generator(test_set.generator(1),
+                    nb_epoch=2,
+                    samples_per_epoch=len(test_set))
 
-model.save('seg_net.mine.h5')
+evaluate_set = camvid[len(camvid) - 100:len(camvid)]
+print model.evaluate_generator(evaluate_set.generator(1), 100)
+
+model.save("seg_net.mine.h5")
 model.save_weights("seg_net.mine.weights.h5", overwrite=True)
 
-print model.evaluate_generator(camvid[len(camvid) - 100:len(camvid)].generator(1), 100)
