@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 from keras.utils.np_utils import to_categorical
+from image_util import normalize_histogram, resize_image
 
 
 def read_labels(labels_file):
@@ -76,9 +77,6 @@ class CamVidDataset(object):
         self.size = len(self._images)
         self.categories_count = len(self._label_dict)
 
-    def __resize_image(self, image):
-        return cv2.resize(image, (self.img_size[1], self.img_size[0]))
-
     @classmethod
     def from_dir(cls):
         datasets_home = os.environ['DATASETS'] + '/camvid'
@@ -102,9 +100,9 @@ class CamVidDataset(object):
             return CamVidDataset(self._images[item], self._labels[item], self._dataset_home, self._label_dict)
         elif isinstance(item, int) and 0 <= item < self.size:
             full_image_path = os.path.join(self._images_dir, self._images[item])
-            image = self.__resize_image(cv2.imread(full_image_path))
+            image = normalize_histogram(resize_image(cv2.imread(full_image_path), self.img_size))
             full_label_path = os.path.join(self._labels_dir, self._labels[item])
-            labels = self._label_image_to_labels(self.__resize_image(cv2.imread(full_label_path)))
+            labels = self._label_image_to_labels(resize_image(cv2.imread(full_label_path), self.img_size))
             return image, labels
         else:
             raise IndexError('invalid index')
