@@ -5,9 +5,8 @@ from keras.layers.normalization import BatchNormalization
 from CamVidDataset import CamVidDataset
 
 
-def seg_net(img_size, categories_count):
+def seg_net(img_size, categories_count, filter_count=64):
     reduction_size = (2, 2)
-    filter_size = 64
     nb_encoders = 4
 
     model = Sequential()
@@ -16,7 +15,7 @@ def seg_net(img_size, categories_count):
     output_shapes = [model.output_shape]
     # encoders
     for i in range(nb_encoders):
-        actual_filter_size = filter_size * (2 ** i)
+        actual_filter_size = filter_count * (2 ** i)
         model.add(Convolution2D(actual_filter_size, 3, 3, border_mode='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
@@ -32,7 +31,7 @@ def seg_net(img_size, categories_count):
         model.add(UpSampling2D(reduction_size))
         if padding[0] != 0 or padding[1] != 0:
             model.add(ZeroPadding2D(padding=padding))
-        actual_filter_size = filter_size * (2 ** (3 - i))
+        actual_filter_size = filter_count * (2 ** (3 - i))
         model.add(Convolution2D(actual_filter_size, 3, 3, border_mode='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
