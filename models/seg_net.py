@@ -2,7 +2,6 @@ from keras.models import Sequential
 from keras.layers import Convolution2D, MaxPooling2D, UpSampling2D, Activation, Reshape, InputLayer, \
     ZeroPadding2D
 from keras.layers.normalization import BatchNormalization
-from CamVidDataset import CamVidDataset
 
 
 def seg_net(img_size, categories_count, filter_count=64):
@@ -41,21 +40,4 @@ def seg_net(img_size, categories_count, filter_count=64):
     model.add(Activation('softmax'))
 
     return model
-
-
-if __name__ == "__main__":
-    camvid = CamVidDataset.from_dir()
-    model = seg_net(camvid.img_size, camvid.categories_count)
-    left_for_test = 1
-    model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
-    test_set = camvid[0:-100]
-    model.fit_generator(test_set.generator(1),
-                        nb_epoch=2,
-                        samples_per_epoch=len(test_set))
-
-    evaluate_set = camvid[len(camvid) - 100:len(camvid)]
-    print model.evaluate_generator(evaluate_set.generator(1), 100)
-
-    model.save("seg_net.mine.h5")
-    model.save_weights("seg_net.mine.weights.h5", overwrite=True)
 
