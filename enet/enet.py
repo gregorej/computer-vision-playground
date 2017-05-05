@@ -1,7 +1,8 @@
-from keras.engine.topology import Input
 from keras.layers.core import Activation
+from keras.layers import Input
 from keras.models import Model
 from keras.utils import plot_model
+from keras.layers import Reshape
 
 import decoder
 import encoder
@@ -16,7 +17,7 @@ def autoencoder(nc, input_shape,
     enet = decoder.build(enet, nc=nc, in_shape=input_shape)
 
     from keras import backend as K
-    enet = K.reshape(enet, (data_shape, nc))
+    enet = Reshape((data_shape, nc))(enet)
     print K.int_shape(enet)
     enet = Activation('softmax')(enet)
     model = Model(inputs=inp, outputs=enet)
