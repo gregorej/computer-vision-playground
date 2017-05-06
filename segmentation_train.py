@@ -1,18 +1,24 @@
-from CamVidDataset import CamVidDataset
+from datasets import CamVid
 from models import enet, seg_net
 from keras.utils import plot_model
 import time
 
-evaluation_set_size = 100
+
+evaluation_set_ratio = 0.01
 
 
 def save_trained_model(model, model_name):
+    import os
+    dir = 'trained_nets'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     timestamp = time.strftime("%Y%m%d-%H:%M:%S")
-    model.save("trained/{}.{}.h5".format(model_name, timestamp))
-    model.save_weights("trained/{}.{}.weights.h5".format(model_name, timestamp), overwrite=True)
-    plot_model(model, to_file='trained/{}.{}.png'.format(model_name, timestamp), show_shapes=True)
+    model.save("{}/{}.{}.h5".format(dir, model_name, timestamp))
+    model.save_weights("{}/{}.{}.weights.h5".format(dir, model_name, timestamp), overwrite=True)
+    plot_model(model, to_file='{}/{}.{}.png'.format(dir, model_name, timestamp), show_shapes=True)
 
-camvid = CamVidDataset.from_dir()
+camvid = CamVid.from_dir()
+evaluation_set_size = int(evaluation_set_ratio * len(camvid))
 #model = seg_net(camvid.img_size, camvid.categories_count, filter_count=16)
 model_name = 'enet'
 model = enet(camvid.img_size, camvid.categories_count)
