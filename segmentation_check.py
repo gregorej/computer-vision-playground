@@ -1,18 +1,18 @@
-from CamVidDataset import CamVidDataset
-from models import seg_net
+from datasets import CamVid
+from models import seg_net, enet
 import cv2
 import numpy as np
 from image_util import normalize_histogram, resize_image
 
 
-ds = CamVidDataset.from_dir()
+ds = CamVid.from_dir()
 img_size = ds.img_size
 labels = ds._label_dict
 
 
-model = seg_net(ds.img_size, len(labels))
+model = enet(ds.img_size, len(labels))
 
-weights_path = 'seg_net.mine.weights.h5'
+weights_path = 'trained_nets/enet.20170506-03:34:20.weights.h5'
 model.load_weights(weights_path)
 
 print 'model loaded'

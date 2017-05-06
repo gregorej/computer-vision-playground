@@ -1,6 +1,6 @@
-from CamVidDataset import CamVidDataset
+from datasets import CamVid
 
-ds = CamVidDataset.from_dir()
+ds = CamVid.from_dir()
 
 print ds._label_dict
 

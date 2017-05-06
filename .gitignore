@@ -1,3 +1,7 @@
 *~
 .idea
 *.iml
+trained_nets
+output
+target
+build
