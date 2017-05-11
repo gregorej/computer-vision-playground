@@ -5,7 +5,7 @@ import numpy as np
 from image_util import normalize_histogram, resize_image
 
 
-ds = CamVid.from_dir()
+ds = CamVid.load_from_datasets_dir()
 img_size = ds.img_size
 labels = ds._label_dict
 

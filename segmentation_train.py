@@ -17,7 +17,7 @@ def save_trained_model(model, model_name):
     model.save_weights("{}/{}.{}.weights.h5".format(dir, model_name, timestamp), overwrite=True)
     plot_model(model, to_file='{}/{}.{}.png'.format(dir, model_name, timestamp), show_shapes=True)
 
-camvid = CamVid.from_dir()
+camvid = CamVid.load_from_datasets_dir()
 evaluation_set_size = int(evaluation_set_ratio * len(camvid))
 #model = seg_net(camvid.img_size, camvid.categories_count, filter_count=16)
 model_name = 'enet'

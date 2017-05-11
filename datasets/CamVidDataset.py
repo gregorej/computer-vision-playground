@@ -78,7 +78,7 @@ class CamVidDataset(object):
         self.categories_count = len(self._label_dict)
 
     @classmethod
-    def from_dir(cls):
+    def load_from_datasets_dir(cls):
         datasets_home = os.environ['DATASETS'] + '/camvid'
         images_dir = datasets_home + '/701_StillsRaw_full'
         labels_dir = datasets_home + '/LabeledApproved_full'
@@ -105,7 +105,7 @@ class CamVidDataset(object):
             labels = self._label_image_to_labels(resize_image(cv2.imread(full_label_path), self.img_size))
             return image, labels
         else:
-            raise IndexError('invalid index')
+            raise IndexError('invalid index: ' + str(item))
 
     def generator(self, batch_size=10):
         return self.Generator(self, batch_size)
