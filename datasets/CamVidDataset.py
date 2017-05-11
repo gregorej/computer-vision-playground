@@ -67,14 +67,13 @@ class CamVidDataset(object):
 
         return to_categorical(res, categories_count)
 
-    def __init__(self, image_files, label_files, dataset_home, label_dict):
+    def __init__(self, sample_files, dataset_home, label_dict):
         self._images_dir = dataset_home + '/701_StillsRaw_full'
-        self._images = image_files
+        self._sample_files = sample_files
         self._labels_dir = dataset_home + '/LabeledApproved_full'
-        self._labels = label_files
         self._dataset_home = dataset_home
         self._label_dict = label_dict
-        self.size = len(self._images)
+        self.size = len(self._sample_files)
         self.categories_count = len(self._label_dict)
 
     @classmethod
@@ -86,8 +85,9 @@ class CamVidDataset(object):
         image_files.sort()
         label_files = [f for f in os.listdir(labels_dir) if f.endswith('.png')]
         label_files.sort()
+        samples = zip(image_files, label_files)
         label_dict = read_labels(datasets_home + '/label_colors.txt')
-        return CamVidDataset(image_files, label_files, datasets_home, label_dict)
+        return CamVidDataset(samples, datasets_home, label_dict)
 
     def __len__(self):
         return self.size
@@ -97,11 +97,12 @@ class CamVidDataset(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return CamVidDataset(self._images[item], self._labels[item], self._dataset_home, self._label_dict)
+            return CamVidDataset(self._sample_files[item], self._dataset_home, self._label_dict)
         elif isinstance(item, int) and 0 <= item < self.size:
-            full_image_path = os.path.join(self._images_dir, self._images[item])
+            image_file, label_file = self._sample_files[item]
+            full_image_path = os.path.join(self._images_dir, image_file)
             image = normalize_histogram(resize_image(cv2.imread(full_image_path), self.img_size))
-            full_label_path = os.path.join(self._labels_dir, self._labels[item])
+            full_label_path = os.path.join(self._labels_dir, label_file)
             labels = self._label_image_to_labels(resize_image(cv2.imread(full_label_path), self.img_size))
             return image, labels
         else:

@@ -26,8 +26,8 @@ model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['a
 
 train_set = camvid[0:-evaluation_set_size]
 model.fit_generator(train_set.generator(1),
-                    nb_epoch=2,
-                    samples_per_epoch=len(train_set))
+                    len(train_set),
+                    epochs=2)
 save_trained_model(model, model_name)
 
 evaluate_set = camvid[len(camvid) - evaluation_set_size:len(camvid)]
