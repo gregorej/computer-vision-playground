@@ -10,6 +10,30 @@ img_size = ds.img_size
 labels = ds._label_dict
 
 
+def bgr(rgb):
+    return rgb[2], rgb[1], rgb[0]
+
+
+def draw_label_captions(labels):
+    square_size = 10
+    row_height = 2 * square_size
+    result_width = 200
+    result = np.zeros((len(labels) * row_height, result_width, 4), dtype='uint8')
+    row = 0
+    row_margin = (row_height - square_size) / 2
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    white = (255, 255, 255)
+    for color, label in labels.iteritems():
+        count, txt = label
+        cv2.rectangle(result, (row_margin, row_height * row + row_margin), (square_size + row_margin, row_height * row + square_size + row_margin), bgr(color), thickness=cv2.FILLED)
+        cv2.putText(result, txt, (square_size + 10, row_height * row + square_size + row_margin), font, 0.5, white, 1, cv2.LINE_AA)
+        row += 1
+    return result
+
+cv2.imshow('legend', draw_label_captions(labels))
+cv2.waitKey()
+
+
 model = enet(ds.img_size, len(labels))
 
 weights_path = 'trained_nets/enet.20170506-03:34:20.weights.h5'
@@ -33,8 +57,10 @@ def unlabel(predicted):
         for y in range(img_size[1]):
             predicted_label = np.argmax(predicted[x, y])
             rgb = reverse_labels[predicted_label]
-            res[x, y] = (rgb[2], rgb[1], rgb[0])
+            res[x, y] = bgr(rgb)
     return res
+
+
 
 cap = cv2.VideoCapture(video_path)
 ret, frame = cap.read()
