@@ -26,7 +26,7 @@ class DataSample(object):
             # plot_bbox(bb_boxes,i,'g')
             bb_box_i = [bb_boxes.iloc[i]['xmin'], bb_boxes.iloc[i]['ymin'],
                         bb_boxes.iloc[i]['xmax'], bb_boxes.iloc[i]['ymax']]
-            img_mask[bb_box_i[1]:bb_box_i[3], bb_box_i[0]:bb_box_i[2]] = 1.
+            img_mask[bb_box_i[1]:bb_box_i[3], bb_box_i[0]:bb_box_i[2]] = 1
             img_mask = np.reshape(img_mask, (np.shape(img_mask)[0], np.shape(img_mask)[1], 1))
         return img_mask
 

@@ -1,7 +1,8 @@
-import vehicles_dataset as ds
+from vehicle_recognition import vehicles_dataset as ds
 from models import small_unet
 from keras import backend as K
 from keras.optimizers import Adam
+from utils.nets import save_trained_model
 
 
 def IOU_calc(y_true, y_pred):
@@ -21,9 +22,6 @@ model = small_unet((ds.img_rows, ds.img_cols))
 model.compile(optimizer=Adam(lr=1e-4),
               loss=IOU_calc_loss, metrics=[IOU_calc])
 
-history = model.fit_generator(training_gen,
-                              samples_per_epoch=5000,
-                              nb_epoch=1)
+history = model.fit_generator(training_gen, steps_per_epoch=2,  epochs=1)
 
-model.save('model_detect_SmallUnet.mine.h5')
-model.save_weights("model_segn_small_udacity_0p71.mine.h5", overwrite=True)
+save_trained_model(model, 'small_unet')

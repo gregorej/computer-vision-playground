@@ -51,7 +51,7 @@ for color, label in labels.iteritems():
     reverse_labels[count] = color
 
 
-def unlabel(predicted):
+def colorize_labels(predicted):
     res = np.zeros((img_size[0], img_size[1], 3), dtype='uint8')
     for x in range(img_size[0]):
         for y in range(img_size[1]):
@@ -65,8 +65,13 @@ def unlabel(predicted):
 cap = cv2.VideoCapture(video_path)
 ret, frame = cap.read()
 count = 0
+paused = False
 while ret:
-    if count % 10 == 0:
+    if paused:
+        key = cv2.waitKey()
+        if key == ord('p'):
+            paused = False
+    elif count % 10 == 0:
         batch = np.zeros((1, img_size[0], img_size[1], 3))
         resized = normalize_histogram(resize_image(frame, img_size))
         batch[0] = resized
@@ -74,8 +79,10 @@ while ret:
         predicted = np.reshape(predicted, (img_size[0], img_size[1], len(labels)))
         print predicted.shape
         cv2.imshow('original', resized)
-        cv2.imshow('segmented', unlabel(predicted))
-        cv2.waitKey(1)
+        cv2.imshow('segmented', colorize_labels(predicted))
+        key = cv2.waitKey(1)
+        if key == ord('p'):
+            paused = True
         print 'frame ' + str(count) + ' analyzed'
     count += 1
     ret, frame = cap.read()
