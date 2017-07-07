@@ -22,6 +22,6 @@ model = small_unet((ds.img_rows, ds.img_cols))
 model.compile(optimizer=Adam(lr=1e-4),
               loss=IOU_calc_loss, metrics=[IOU_calc])
 
-history = model.fit_generator(training_gen, steps_per_epoch=2,  epochs=1)
+history = model.fit_generator(training_gen, steps_per_epoch=5000,  epochs=1)
 
 save_trained_model(model, 'small_unet')
