@@ -33,7 +33,7 @@ class Cropper(object):
 
     def change_image(self, image):
         self.__image = image
-        self.__reset()
+        self.reset()
         self.__refresh_image()
 
     def start(self, image):
@@ -54,7 +54,7 @@ class Cropper(object):
         elif key == ord("c"):
             if self.__currentCrop is not None:
                 self.__onCrop(self.__currentCrop)
-                self.__reset()
+                self.reset()
 
     def __click_and_crop(self, event, x, y):
         # if the left mouse button was clicked, record the starting
@@ -65,7 +65,11 @@ class Cropper(object):
             self.__cropping = True
 
         if self.__cropping:
-            self.__currentCrop = (self.__startPoint, (x, y))
+            minx = min(self.__startPoint[0], x)
+            miny = min(self.__startPoint[1], y)
+            maxx = max(self.__startPoint[0], x)
+            maxy = max(self.__startPoint[1], y)
+            self.__currentCrop = ((minx, miny), (maxx, maxy))
 
         # check to see if the left mouse button was released
         if event == cv2.EVENT_LBUTTONUP:
@@ -74,7 +78,12 @@ class Cropper(object):
             self.__cropping = False
             self.__startPoint = None
 
-    def __reset(self):
+    def capture(self):
+        crop = self.__currentCrop
+        self.reset()
+        return crop
+
+    def reset(self):
         self.__cropping = False
         self.__currentCrop = None
         self.__startPoint = None

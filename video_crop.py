@@ -36,6 +36,17 @@ class VideoCropper(object):
         self.__current_frame = frame
         self.__cropper.start(frame)
 
+
+def csv_with_headers(file_path, headers):
+    if os.path.isfile(file_path):
+        output_csv = open(file_path, 'a')
+        csv_writer = csv.writer(output_csv, delimiter=' ')
+    else:
+        output_csv = open(file_path, 'wb')
+        csv_writer = csv.writer(output_csv, delimiter=' ')
+        csv_writer.writerow(headers)
+    return csv_writer
+
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
@@ -47,15 +58,16 @@ if __name__ == "__main__":
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    output_csv = open(output_dir + '/labels.csv', 'wb')
-    csv_writer = csv.writer(output_csv, delimiter=' ')
+    labels_file_path = output_dir + '/labels.csv'
+    labels_writer = csv_with_headers(labels_file_path, ["Frame", "minx", "miny", "maxx", "maxy"])
+
     video_file_name = args["video"]
     video_file_base_name = os.path.splitext(os.path.basename(video_file_name))[0]
 
     def handle_crop(crop, frame_no, frame):
         frame_file = video_file_base_name + '_' + str(frame_no) + '.jpg'
-        csv_writer.writerow([frame_file, crop[0][0], crop[0][1], crop[1][0], crop[1][1]])
-        output_csv.flush()
+        #xmin,ymin,xmax,ymax
+        labels_writer.writerow([frame_file, crop[0][0], crop[0][1], crop[1][0], crop[1][1]])
         cv2.imwrite(output_dir + '/' + frame_file, frame)
 
     cap = cv2.VideoCapture(video_file_name)
