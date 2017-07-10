@@ -1,4 +1,4 @@
-from vehicle_recognition import vehicles_dataset as ds
+from datasets.vehicles import crowdai, object_detect, concat
 from models import small_unet
 from keras import backend as K
 from keras.optimizers import Adam
@@ -16,7 +16,8 @@ def IOU_calc(y_true, y_pred):
 def IOU_calc_loss(y_true, y_pred):
     return -IOU_calc(y_true, y_pred)
 
-training_gen = ds.generate_train_batch(1)
+ds = concat([crowdai, object_detect])
+training_gen = ds.generator(1)
 smooth = 1.
 model = small_unet((ds.img_rows, ds.img_cols))
 model.compile(optimizer=Adam(lr=1e-4),

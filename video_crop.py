@@ -59,7 +59,7 @@ if __name__ == "__main__":
         os.makedirs(output_dir)
 
     labels_file_path = output_dir + '/labels.csv'
-    labels_writer = csv_with_headers(labels_file_path, ["Frame", "minx", "miny", "maxx", "maxy"])
+    labels_writer = csv_with_headers(labels_file_path, ["Frame", "xmin", "ymin", "xmax", "ymax", "Label"])
 
     video_file_name = args["video"]
     video_file_base_name = os.path.splitext(os.path.basename(video_file_name))[0]
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     def handle_crop(crop, frame_no, frame):
         frame_file = video_file_base_name + '_' + str(frame_no) + '.jpg'
         #xmin,ymin,xmax,ymax
-        labels_writer.writerow([frame_file, crop[0][0], crop[0][1], crop[1][0], crop[1][1]])
+        labels_writer.writerow([frame_file, crop[0][0], crop[0][1], crop[1][0], crop[1][1], "car"])
         cv2.imwrite(output_dir + '/' + frame_file, frame)
 
     cap = cv2.VideoCapture(video_file_name)

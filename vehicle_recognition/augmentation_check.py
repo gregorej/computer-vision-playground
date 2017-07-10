@@ -26,46 +26,46 @@ for i in range(len(bb_boxes)):
                 bb_boxes.iloc[i]['xmax'], bb_boxes.iloc[i]['ymax']]
     plt.plot(bb_box_i[0], bb_box_i[1], 'rs')
     plt.plot(bb_box_i[2], bb_box_i[3], 'bs')
-plt.axis('off')
-plt.subplot(1, 2, 2)
-plt.imshow(dst.image)
-# bb_boxes1 = bb_boxes.copy(deep=True)
-# bb_boxes1['xmin'] = (bb_boxes['xmin'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
-# bb_boxes1['xmax'] = (bb_boxes['xmax'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
-# bb_boxes1['ymin'] = (bb_boxes['ymin'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
-# bb_boxes1['ymax'] = (bb_boxes['ymax'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
-plt.plot(0, 0, 'mo')
-plt.plot(img.shape[1], 0, 'mo')
-plt.plot(img.shape[1], img.shape[0], 'mo')
-plt.plot(0, img.shape[0], 'mo')
-plot_im_bbox(dst)
+    plt.axis('off')
+    plt.subplot(1, 2, 2)
+    plt.imshow(dst.image)
+    # bb_boxes1 = bb_boxes.copy(deep=True)
+    # bb_boxes1['xmin'] = (bb_boxes['xmin'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
+    # bb_boxes1['xmax'] = (bb_boxes['xmax'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
+    # bb_boxes1['ymin'] = (bb_boxes['ymin'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
+    # bb_boxes1['ymax'] = (bb_boxes['ymax'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
+    plt.plot(0, 0, 'mo')
+    plt.plot(img.shape[1], 0, 'mo')
+    plt.plot(img.shape[1], img.shape[0], 'mo')
+    plt.plot(0, img.shape[0], 'mo')
+    plot_im_bbox(dst)
 
-plt.axis('off')
+    plt.axis('off')
 
-sample = get_sample_by_index(1)
-img_mask = sample.merged_mask()
+    sample = get_sample_by_index(1)
+    img_mask = sample.merged_mask()
 
-plt.figure(figsize=(12, 8))
-plt.subplot(2, 2, 1)
-plot_im_bbox(sample)
+    plt.figure(figsize=(12, 8))
+    plt.subplot(2, 2, 1)
+    plot_im_bbox(sample)
 
-plt.subplot(2, 2, 2)
-plt.imshow(img_mask[:, :, 0])
-plt.axis('off')
+    plt.subplot(2, 2, 2)
+    plt.imshow(img_mask[:, :, 0])
+    plt.axis('off')
 
-plt.subplot(2, 2, 3)
-# dst, bb_boxes1 = trans_image(img, bb_boxes, 100)
-# dst, bb_boxes1 = stretch_image(img, bb_boxes, 100)
-dst = sample.copy()
-dst.stretch(100)
+    plt.subplot(2, 2, 3)
+    # dst, bb_boxes1 = trans_image(img, bb_boxes, 100)
+    # dst, bb_boxes1 = stretch_image(img, bb_boxes, 100)
+    dst = sample.copy()
+    dst.stretch(100)
 
-plt.imshow(dst.image)
+    plt.imshow(dst.image)
+    
+    plot_im_bbox(dst)
 
-plot_im_bbox(dst)
+    plt.subplot(2, 2, 4)
+    img_mask2 = dst.merged_mask()
+    plt.imshow(img_mask2[:,:,0])
+    plt.axis('off')
 
-plt.subplot(2, 2, 4)
-img_mask2 = dst.merged_mask()
-plt.imshow(img_mask2[:,:,0])
-plt.axis('off')
-
-plt.show()
+    plt.show()

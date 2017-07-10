@@ -1,9 +1,11 @@
-import vehicles_dataset as ds
+from datasets.vehicles import concat, crowdai, object_detect
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 
-training_gen = ds.generate_train_batch(10)
+ds = concat([object_detect, crowdai])
+
+training_gen = ds.generator(10)
 batch_img, batch_mask = next(training_gen)
 ### Plotting generator output
 for i in range(10):
