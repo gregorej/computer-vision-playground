@@ -1,13 +1,17 @@
 from VehiclesMaskDataset import VehiclesMaskDataset as vehicles
+from augmentations import stretch
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from predefined import crowdai, custom_ds, object_detect
 
 
+all = vehicles.concat([crowdai[0:2], object_detect[0:2], custom_ds[0:2]]).with_augmentations([stretch])
+sosnowiecka = vehicles.load_from_dir('sosnowiecka', separator=' ')
+ds = sosnowiecka.with_augmentations([stretch(80), stretch(200)])
 
-all = vehicles.concat([crowdai[0:2], object_detect[0:2], custom_ds[0:2]])
-ds = all
+print len(sosnowiecka)
+print len(ds)
 
 for batch_image, batch_mask in ds.generator(1):
     image = np.array(batch_image[0], dtype=np.uint8)

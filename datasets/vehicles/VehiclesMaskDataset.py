@@ -39,23 +39,30 @@ class VehiclesMaskDataset(object):
         def __iter__(self):
             return self
 
-    def __init__(self, vehicle_rows):
+    def __init__(self, vehicle_rows, augmentations=[]):
         self.__vehicle_rows = vehicle_rows
         self.size = len(vehicle_rows.index)
+        self.augmentations = augmentations
+
+    def with_augmentations(self, augmentations):
+        return VehiclesMaskDataset(self.__vehicle_rows, augmentations)
 
     def __len__(self):
-        return self.size
+        return self.size * (len(self.augmentations) + 1)
 
     def _get_sample_by_index(self, index):
         # Get image by name
+        original_image_index = index // (len(self.augmentations) + 1)
+        augmentation_index = index % (len(self.augmentations) + 1)
         df = self.__vehicle_rows
-        file_name = df['File_Path'][index]
+        file_name = df['File_Path'][original_image_index]
         img = cv2.imread(file_name)
         name_str = file_name.split('/')
         name_str = name_str[-1]
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         bb_boxes = df[df['Frame'] == name_str].reset_index()
-        return DataSample(img, bb_boxes)
+        sample = DataSample(img, bb_boxes)
+        return sample if augmentation_index == 0 else self.augmentations[augmentation_index - 1](sample)
 
     def generator(self, batch_size=10):
         return self.Generator(self, batch_size)

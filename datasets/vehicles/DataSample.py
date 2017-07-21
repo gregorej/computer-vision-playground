@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 class DataSample(object):
 
     def __init__(self, image, bb_boxes):

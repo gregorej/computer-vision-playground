@@ -19,22 +19,30 @@ class VideoCropper(object):
             ret, frame = self.__video.read()
             if ret:
                 self.__frame_count += 1
+                print self.__frame_count
                 self.__current_frame = frame
                 self.__cropper.change_image(frame)
 
     def on_crop(self, crop):
         self.__on_crop = crop
 
-    def start(self, capture):
+    def go_to_frame(self, frame_no):
+        ret = True
+        counter = 1
+        self.__frame_count = frame_no
+        while counter < frame_no and ret:
+            ret = self.__video.grab()
+            counter += 1
+            print counter
+        ret, frame = self.__video.read()
+        self.__current_frame = frame
+
+    def start(self, capture, initial_frame=1):
         self.__video = capture
+        self.go_to_frame(initial_frame)
         self.__cropper.on_crop(lambda crop: self.__on_crop(crop, self.__frame_count, self.__current_frame))
         add_event_loop_listener(lambda key: self.__on_key(key))
-        ret, frame = capture.read()
-        if not ret:
-            return
-        self.__frame_count = 1
-        self.__current_frame = frame
-        self.__cropper.start(frame)
+        self.__cropper.start(self.__current_frame)
 
 
 def csv_with_headers(file_path, headers):
@@ -50,8 +58,9 @@ def csv_with_headers(file_path, headers):
 if __name__ == "__main__":
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-v", "--video", required=True, help="Path to the image")
+    ap.add_argument("-v", "--video", required=True, help="Path to the video")
     ap.add_argument("-o", "--output", required=False, default="output")
+    ap.add_argument("-i", '--initial-frame', required=False, type=int, default=0)
     args = vars(ap.parse_args())
 
     output_dir = args["output"]
@@ -73,7 +82,7 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture(video_file_name)
     cropper = VideoCropper("video")
     cropper.on_crop(handle_crop)
-    cropper.start(cap)
+    cropper.start(cap, initial_frame=args["initial_frame"])
 
     start_event_loop()
 
