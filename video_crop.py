@@ -19,7 +19,7 @@ class VideoCropper(object):
             ret, frame = self.__video.read()
             if ret:
                 self.__frame_count += 1
-                print self.__frame_count
+                print(self.__frame_count)
                 self.__current_frame = frame
                 self.__cropper.change_image(frame)
 
@@ -33,7 +33,7 @@ class VideoCropper(object):
         while counter < frame_no and ret:
             ret = self.__video.grab()
             counter += 1
-            print counter
+            print(counter)
         ret, frame = self.__video.read()
         self.__current_frame = frame
 

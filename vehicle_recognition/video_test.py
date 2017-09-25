@@ -66,7 +66,7 @@ while True:
         t = time.time()
         pred, img = test_frame(frame)
         end = time.time()
-        print (end - t)
+        print(end - t)
         cv2.imshow('car_detect', draw_bounding_box(segmentation(img, pred), pred))
     frame_count += 1
     k = cv2.waitKey(30) & 0xff

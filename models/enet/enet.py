@@ -15,7 +15,7 @@ def build(input_shape, categories_count):
 
     from keras import backend as K
     enet = Reshape((data_shape, categories_count))(enet)
-    print K.int_shape(enet)
+    print(K.int_shape(enet))
     enet = Activation('softmax')(enet)
     model = Model(inputs=inp, outputs=enet)
     return model

@@ -13,7 +13,6 @@ ap.add_argument("-o", "--output-dir", required=False, help="Output directory", d
 ap.add_argument("video_file")
 
 args = vars(ap.parse_args())
-print args
 
 output_dir = args["output_dir"]
 

@@ -28,10 +28,10 @@ coco = COCO(annFile)
 
 cats = coco.loadCats(coco.getCatIds())
 nms=[cat['name'] for cat in cats]
-print 'COCO categories: \n\n', ' '.join(nms)
+print('COCO categories: \n\n', ' '.join(nms))
 
 nms = set([cat['supercategory'] for cat in cats])
-print 'COCO supercategories: \n', ' '.join(nms)
+print('COCO supercategories: \n', ' '.join(nms))
 
 catIds = coco.getCatIds(catNms=['person','dog','skateboard'])
 imgIds = coco.getImgIds(catIds=catIds)

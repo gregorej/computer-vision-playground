@@ -22,8 +22,8 @@ batch_img, batch_mask = next(training_gen)
 start = time.time()
 pred_all = model.predict(batch_img)
 end = time.time()
-print np.shape(pred_all)
-print "Detection took " + str(end - start) + " seconds"
+print(np.shape(pred_all))
+print("Detection took " + str(end - start) + " seconds")
 
 for i in range(len(batch_img)):
 

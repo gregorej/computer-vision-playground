@@ -87,5 +87,5 @@ def get_sample_by_index(index):
     return DataSample(img, bb_boxes)
 
 if __name__ == '__main__':
-    print vehicles.head()
-    print vehicles.tail()
+    print(vehicles.head())
+    print(vehicles.tail())

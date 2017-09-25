@@ -18,7 +18,6 @@ def calibrateCamera(objpts, imgpts, size):
 def drawCorners(img, corners):
     for c in corners:
         center = tuple(c[0])
-        #print center
         cv2.circle(img, center, 4, GREEN, -1) # -1 means fill
     cv2.imshow('chessboard', img)
     cv2.waitKey(1)
@@ -38,9 +37,9 @@ def calibrate(path, save=True, ignore_old_calib=True):
     for imgFile in files:
         img = cv2.imread(imgFile)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        print imgFile
+        print(imgFile)
         size = gray.shape
-        print size
+        print(size)
         ret, corners = cv2.findChessboardCorners(gray, chessboardSize, None)
         if ret:
             drawCorners(gray, corners)
@@ -58,5 +57,5 @@ if __name__ == "__main__":
     ap.add_argument("-p", "--pictures-dir", required=True, help="Directory with pictures used to calibrate")
     args = vars(ap.parse_args())
     result = calibrate(args['pictures_dir'], save=False)
-    print result['mtx']
-    print result['dist']
+    print(result['mtx'])
+    print(result['dist'])

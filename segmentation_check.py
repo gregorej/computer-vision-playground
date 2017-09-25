@@ -39,7 +39,7 @@ model = enet(ds.img_size, len(labels))
 weights_path = 'trained_nets/enet.20170506-03:34:20.weights.h5'
 model.load_weights(weights_path)
 
-print 'model loaded'
+print('model loaded')
 
 video_path = '/home/sharky/Wideo/krakow_walk.mp4'
 
@@ -77,12 +77,12 @@ while ret:
         batch[0] = resized
         predicted = model.predict(batch, batch_size=1)[0]
         predicted = np.reshape(predicted, (img_size[0], img_size[1], len(labels)))
-        print predicted.shape
+        print(predicted.shape)
         cv2.imshow('original', resized)
         cv2.imshow('segmented', colorize_labels(predicted))
         key = cv2.waitKey(1)
         if key == ord('p'):
             paused = True
-        print 'frame ' + str(count) + ' analyzed'
+        print('frame ' + str(count) + ' analyzed')
     count += 1
     ret, frame = cap.read()

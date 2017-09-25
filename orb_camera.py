@@ -18,7 +18,7 @@ while(1):
 	if previousDes is not None:
 		matches = bf.match(previousDes,des)
 		matches = sorted(matches, key = lambda x:x.distance)
-		print len(matches)
+		print(len(matches))
 		cv2.drawMatches(previousFrame,previousKp,frame,kp,matches, frame)
 	previousDes = des
 	previousFrame = frame

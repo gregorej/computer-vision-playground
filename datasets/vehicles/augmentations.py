@@ -42,3 +42,10 @@ def perform_stretch(data_sample, scale_range=80):
     bb_boxes_f['ymin'] = (bb_boxes_f['ymin'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
     bb_boxes_f['ymax'] = (bb_boxes_f['ymax'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
     return DataSample(img, bb_boxes_f)
+
+
+def flip_horizontally(ds):
+    bb_boxes = ds.bb_boxes.copy()
+    img = cv2.flip(ds.image, 1)
+
+    return DataSample(img, bb_boxes)

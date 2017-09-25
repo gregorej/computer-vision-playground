@@ -26,15 +26,15 @@ Y_test = np_utils.to_categorical(y_test, 10)
 # 7. Define model architecture
 model = Sequential()
 model.add(Convolution2D(32, 3, 3, activation='relu', input_shape=(1,28,28), dim_ordering='th'))
-print model.output_shape
+print(model.output_shape)
 model.add(Convolution2D(32, 3, 3, activation='relu'))
-print model.output_shape
+print(model.output_shape)
 model.add(MaxPooling2D(pool_size=(2,2)))
-print model.output_shape
+print(model.output_shape)
 model.add(Dropout(0.25))
-print model.output_shape
+print(model.output_shape)
 model.add(Flatten())
-print model.output_shape
+print(model.output_shape)
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(10, activation='softmax'))
@@ -50,4 +50,4 @@ model.fit(X_train, Y_train,
  
 # 10. Evaluate model on test data
 score = model.evaluate(X_test, Y_test, verbose=0)
-print score
+print(score)

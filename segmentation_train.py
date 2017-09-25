@@ -21,5 +21,5 @@ save_trained_model(model, model_name)
 
 
 evaluate_set = camvid[len(camvid) - evaluation_set_size:len(camvid)]
-print model.evaluate_generator(evaluate_set.generator(1), evaluation_set_size)
+print(model.evaluate_generator(evaluate_set.generator(1), evaluation_set_size))
 
