@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from DataSample import DataSample
+import copy
 
 
 def stretch(scale_range):
@@ -45,7 +46,16 @@ def perform_stretch(data_sample, scale_range=80):
 
 
 def flip_horizontally(ds):
-    bb_boxes = ds.bb_boxes.copy()
+    bb_boxes = copy.deepcopy(ds.bb_boxes)
+    _, width, _ = np.shape(ds.image)
+    middle = width / 2
+    flip_x = lambda x: 2 * middle - x
+    bb_boxes = map(lambda bbox: (
+        flip_x(bbox[2]),
+        bbox[1],
+        flip_x(bbox[0]),
+        bbox[3]
+    ), bb_boxes)
     img = cv2.flip(ds.image, 1)
 
     return DataSample(img, bb_boxes)

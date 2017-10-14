@@ -3,8 +3,7 @@ import os
 import cv2
 import pandas as pd
 from DataSample import DataSample
-
-datasets_home = os.environ['DATASETS'] + '/vehicles'
+from datasets.util import datasets_home, get_file_through_cache, load_bbox_samples
 
 
 class VehiclesMaskDataset(object):
@@ -41,7 +40,7 @@ class VehiclesMaskDataset(object):
 
     def __init__(self, vehicle_rows, augmentations=[]):
         self.__vehicle_rows = vehicle_rows
-        self.size = len(vehicle_rows.index)
+        self.size = len(vehicle_rows)
         self.augmentations = augmentations
 
     def with_augmentations(self, augmentations):
@@ -54,13 +53,11 @@ class VehiclesMaskDataset(object):
         # Get image by name
         original_image_index = index // (len(self.augmentations) + 1)
         augmentation_index = index % (len(self.augmentations) + 1)
-        df = self.__vehicle_rows
-        file_name = df['File_Path'][original_image_index]
-        img = cv2.imread(file_name)
-        name_str = file_name.split('/')
-        name_str = name_str[-1]
+        sample = self.__vehicle_rows[original_image_index]
+        image_file_name = get_file_through_cache(sample[0])
+        img = cv2.imread(image_file_name)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        bb_boxes = df[df['Frame'] == name_str].reset_index()
+        bb_boxes = sample[1]
         sample = DataSample(img, bb_boxes)
         return sample if augmentation_index == 0 else self.augmentations[augmentation_index - 1](sample)
 
@@ -81,13 +78,6 @@ class VehiclesMaskDataset(object):
 
     @staticmethod
     def load_from_dir(directory, separator=' '):
-        datasets_home = os.environ['DATASETS']
-        absolute_directory = datasets_home + '/' + directory
-        labels_csv = pd.read_csv(absolute_directory + '/labels.csv', header=0, delimiter=separator)
-        filtered_labels_csv = labels_csv[(labels_csv['Label'].str.lower() == 'car') | (labels_csv['Label'].str.lower() == 'truck')].reset_index()
-        filtered_labels_csv = filtered_labels_csv[filtered_labels_csv["xmin"] < filtered_labels_csv["xmax"]].reset_index()
-        filtered_labels_csv = filtered_labels_csv.drop('index', 1)
-        filtered_labels_csv['File_Path'] = absolute_directory + '/' + filtered_labels_csv['Frame']
-        if 'Preview URL' in filtered_labels_csv.columns:
-            filtered_labels_csv = filtered_labels_csv.drop('Preview URL', 1)
-        return VehiclesMaskDataset(filtered_labels_csv)
+        absolute_directory = os.path.join(datasets_home, directory)
+        samples = load_bbox_samples(absolute_directory, separator=separator)
+        return VehiclesMaskDataset(samples)

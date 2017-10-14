@@ -3,10 +3,10 @@ from augmentations import stretch, flip_horizontally
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from predefined import crowdai, custom_ds, object_detect
+#from predefined import crowdai, custom_ds, object_detect
 
 
-all = vehicles.concat([crowdai[0:2], object_detect[0:2], custom_ds[0:2]]).with_augmentations([stretch])
+#all = vehicles.concat([crowdai[0:2], object_detect[0:2], custom_ds[0:2]]).with_augmentations([stretch])
 sosnowiecka = vehicles.load_from_dir('sosnowiecka', separator=' ')
 ds = sosnowiecka.with_augmentations([flip_horizontally])
 
