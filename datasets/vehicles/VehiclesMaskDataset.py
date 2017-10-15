@@ -1,7 +1,5 @@
 import numpy as np
-import os
 import cv2
-import pandas as pd
 from DataSample import DataSample
 from datasets.util import datasets_home, get_file_through_cache, load_bbox_samples
 
@@ -64,6 +62,9 @@ class VehiclesMaskDataset(object):
     def generator(self, batch_size=10):
         return self.Generator(self, batch_size)
 
+    def concat(self, other_set):
+        return VehiclesMaskDataset(self.__vehicle_rows + other_set.__vehicle_rows)
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return VehiclesMaskDataset(self.__vehicle_rows[item])
@@ -72,12 +73,13 @@ class VehiclesMaskDataset(object):
 
     @staticmethod
     def concat(datasets):
-        concat_vehicles = pd.concat(map(lambda ds: ds.__vehicle_rows, datasets)).reset_index()
-        concat_vehicles = concat_vehicles.drop('index', 1)
-        return VehiclesMaskDataset(concat_vehicles)
+        result = VehiclesMaskDataset([])
+        for dataset in datasets:
+            result = result.concat(dataset)
+        return result
 
     @staticmethod
     def load_from_dir(directory, separator=' '):
-        absolute_directory = os.path.join(datasets_home, directory)
+        absolute_directory = datasets_home + '/' + directory
         samples = load_bbox_samples(absolute_directory, separator=separator)
         return VehiclesMaskDataset(samples)
