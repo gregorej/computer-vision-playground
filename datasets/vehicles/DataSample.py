@@ -13,7 +13,6 @@ class DataSample(object):
         img_size = np.shape(self.image)
         self.image = cv2.resize(self.image, new_size)
         img_size_post = np.shape(self.image)
-        print self.bb_boxes
         self.bb_boxes = map(lambda bbox: (
             bbox[0] * img_size_post[1] / img_size[1],
             bbox[1] * img_size_post[0] / img_size[0],
@@ -24,7 +23,6 @@ class DataSample(object):
     def merged_mask(self):
         img = self.image
         bb_boxes = self.bb_boxes
-        print bb_boxes
         img_mask = np.zeros_like(img[:, :, 0])
         for i in range(len(bb_boxes)):
             bb_box_i = bb_boxes[i]
