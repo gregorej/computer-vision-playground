@@ -11,7 +11,7 @@ def stretch(scale_range):
 def perform_stretch(data_sample, scale_range=80):
     # Stretching augmentation
     img = data_sample.image.copy()
-    bb_boxes_f = data_sample.bb_boxes.copy()
+    bb_boxes_f = copy.deepcopy(data_sample.bb_boxes)
     # bb_boxes_f = bb_boxes_f.copy(deep=True)
 
     tr_x1 = scale_range*np.random.uniform()
@@ -38,10 +38,14 @@ def perform_stretch(data_sample, scale_range=80):
     img = cv2.warpPerspective(img, m, (img.shape[1], img.shape[0]))
     img = np.array(img, dtype=np.uint8)
 
-    bb_boxes_f['xmin'] = (bb_boxes_f['xmin'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
-    bb_boxes_f['xmax'] = (bb_boxes_f['xmax'] - p1[0])/(p2[0]-p1[0])*img.shape[1]
-    bb_boxes_f['ymin'] = (bb_boxes_f['ymin'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
-    bb_boxes_f['ymax'] = (bb_boxes_f['ymax'] - p1[1])/(p3[1]-p1[1])*img.shape[0]
+    def stretch_bbox(bbox):
+        xmin = int((bbox[0] - p1[0])/(p2[0]-p1[0])*img.shape[1])
+        ymin = int((bbox[1] - p1[1])/(p3[1]-p1[1])*img.shape[0])
+        xmax = int((bbox[2] - p1[0])/(p2[0]-p1[0])*img.shape[1])
+        ymax = int((bbox[3] - p1[1])/(p3[1]-p1[1])*img.shape[0])
+        return (xmin, ymin, xmax, ymax)
+
+    bb_boxes_f = map(stretch_bbox, bb_boxes_f)
     return DataSample(img, bb_boxes_f)
 
 

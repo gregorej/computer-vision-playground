@@ -1,13 +1,15 @@
 import os
 import re
-
 from keras.utils.data_utils import get_file as keras_get_file
+import boto3
+import tarfile
+from utils.nets import ensure_dir_exists
 
 datasets_home = os.environ['DATASETS']
 
 datasets_cache_dir = '/tmp/datasets'
 
-protocol_pattern = re.compile("^(http|https)://.*$")
+protocol_pattern = re.compile("^[a-z]+://.*$")
 
 
 def load_bbox_samples(dataset_dir, separator=' ', categories=['truck', 'car']):
@@ -26,6 +28,33 @@ def load_bbox_samples(dataset_dir, separator=' ', categories=['truck', 'car']):
     return sorted(samples, key=lambda sample: sample[0])
 
 
+def is_s3_path(path):
+    return path.startswith('s3://')
+
+
+def parse_s3_path(s3_path):
+    if not is_s3_path(s3_path):
+        raise ValueError('Not a valid S3 path ' + str(s3_path))
+    s3_path = s3_path[len('s3://'):]
+    parts = s3_path.split('/')
+    bucket = parts[0]
+    path = '/'.join(parts[1:])
+    return bucket, path
+
+
+def unpack(file_path, destination_dir):
+    ensure_dir_exists(destination_dir)
+    with tarfile.open(file_path) as archive:
+        archive.extractall(destination_dir)
+
+
+def load_from_s3(s3_path, local_path):
+    bucket, path = parse_s3_path(s3_path)
+    print("Downloading {} to {}".format(s3_path, local_path))
+    s3 = boto3.resource('s3')
+    s3.Bucket(bucket).download_file(path, local_path)
+
+
 def get_file_through_cache(fname, directory=None):
     if directory is None:
         parts = fname.split('/')
@@ -36,6 +65,30 @@ def get_file_through_cache(fname, directory=None):
         return keras_get_file(fname, directory)
     else:
         return os.path.join(directory, fname)
+
+
+def basename(path):
+    from urlparse import urlparse
+    from os.path import splitext, basename
+    disassembled = urlparse(path)
+    filename, file_ext = splitext(basename(disassembled.path))
+    return filename
+
+
+def download_if_needed(path):
+    if is_s3_path(path):
+        dataset_name = basename(path)
+        ensure_dir_exists(datasets_cache_dir)
+        dataset_local_path = os.path.join(datasets_cache_dir, dataset_name)
+        if os.path.isdir(dataset_local_path):
+            return dataset_local_path
+        archive_path = os.path.join(datasets_cache_dir, dataset_name + '.tar.gz')
+        load_from_s3(path + '.tar.gz', archive_path)
+        unpack(archive_path, datasets_cache_dir)
+        if not os.path.isdir(dataset_local_path):
+            raise IOError('Downloaded the dataset but the ' + str(dataset_local_path) + ' does not exist')
+        return dataset_local_path
+    return path
 
 
 if __name__ == '__main__':

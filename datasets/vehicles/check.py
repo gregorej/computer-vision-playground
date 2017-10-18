@@ -8,7 +8,7 @@ import numpy as np
 
 #all = vehicles.concat([crowdai[0:2], object_detect[0:2], custom_ds[0:2]]).with_augmentations([stretch])
 sosnowiecka = vehicles.load_from_dir('sosnowiecka', separator=' ')
-ds = sosnowiecka.with_augmentations([flip_horizontally])
+ds = sosnowiecka.with_augmentations([stretch(80), flip_horizontally])
 
 print(len(sosnowiecka))
 print(len(ds))

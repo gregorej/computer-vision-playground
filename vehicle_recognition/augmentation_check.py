@@ -22,8 +22,7 @@ plt.imshow(img)
 for i in range(len(bb_boxes)):
     plot_bbox(bb_boxes, i, 'g')
 
-    bb_box_i = [bb_boxes.iloc[i]['xmin'], bb_boxes.iloc[i]['ymin'],
-                bb_boxes.iloc[i]['xmax'], bb_boxes.iloc[i]['ymax']]
+    bb_box_i = bb_boxes[i]
     plt.plot(bb_box_i[0], bb_box_i[1], 'rs')
     plt.plot(bb_box_i[2], bb_box_i[3], 'bs')
     plt.axis('off')
