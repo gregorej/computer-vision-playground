@@ -87,6 +87,7 @@ def download_if_needed(path):
         unpack(archive_path, datasets_cache_dir)
         if not os.path.isdir(dataset_local_path):
             raise IOError('Downloaded the dataset but the ' + str(dataset_local_path) + ' does not exist')
+        os.remove(archive_path)
         return dataset_local_path
     return path
 
