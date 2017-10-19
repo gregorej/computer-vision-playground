@@ -95,5 +95,5 @@ def download_if_needed(path):
 if __name__ == '__main__':
     dataset_dir = '/home/sharky/.datasets/sosnowiecka'
     samples = load_bbox_samples(dataset_dir)
-    print len(samples)
-    print samples[0]
+    print(len(samples))
+    print(samples[0])
