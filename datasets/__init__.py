@@ -1,1 +1,1 @@
-from CamVidDataset import CamVidDataset as CamVid
+from datasets.CamVidDataset import CamVidDataset as CamVid
