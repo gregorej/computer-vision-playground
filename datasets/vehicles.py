@@ -1,4 +1,4 @@
-from datasets.vehicles.VehiclesMaskDataset import VehiclesMaskDataset
+from .vehicles.VehiclesMaskDataset import VehiclesMaskDataset
 
 
 def concat(datasets):

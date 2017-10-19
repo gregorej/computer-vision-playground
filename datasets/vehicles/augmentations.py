@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from DataSample import DataSample
+from .DataSample import DataSample
 import copy
 
 

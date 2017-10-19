@@ -1,4 +1,4 @@
-from VehiclesMaskDataset import VehiclesMaskDataset as vehicles
+from .VehiclesMaskDataset import VehiclesMaskDataset as vehicles
 from augmentations import stretch, flip_horizontally
 import cv2
 import matplotlib.pyplot as plt

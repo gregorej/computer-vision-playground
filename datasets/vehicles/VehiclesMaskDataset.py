@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from DataSample import DataSample
+from .DataSample import DataSample
 from datasets.util import datasets_home, get_file_through_cache, load_bbox_samples, download_if_needed
 import random
 import copy
