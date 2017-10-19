@@ -1,4 +1,4 @@
-from VehiclesMaskDataset import VehiclesMaskDataset
+from .VehiclesMaskDataset import VehiclesMaskDataset
 #from predefined import custom_ds, crowdai, object_detect
 
 
