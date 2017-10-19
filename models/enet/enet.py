@@ -3,8 +3,8 @@ from keras.layers import Input
 from keras.models import Model
 from keras.layers import Reshape
 
-import decoder
-import encoder
+from models.enet import decoder
+from models.enet import encoder
 
 
 def build(input_shape, categories_count):
