@@ -40,11 +40,11 @@ history = model.fit_generator(training_gen,
 save_trained_model(model, 'small_unet', history=history.history)
 
 
-print history.history
-print history.history['val_loss']
+print(history.history)
+print(history.history['val_loss'])
 
-print "Evaluating..."
+print("Evaluating...")
 
-print model.evaluate_generator(test_dataset.generator(batch_size=batch_size),
-                               steps=len(test_dataset)/2)
+evaluation_score = model.evaluate_generator(test_dataset.generator(batch_size=batch_size), steps=len(test_dataset) / 2)
+print(evaluation_score)
 
