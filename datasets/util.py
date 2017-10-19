@@ -68,7 +68,10 @@ def get_file_through_cache(fname, directory=None):
 
 
 def basename(path):
-    from urlparse import urlparse
+    try:
+        from urllib.parse import urlparse
+    except ImportError:
+        from urlparse import urlparse
     from os.path import splitext, basename
     disassembled = urlparse(path)
     filename, file_ext = splitext(basename(disassembled.path))
