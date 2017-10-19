@@ -20,6 +20,9 @@ class VehiclesMaskDataset(object):
             self.ds = dataset
             self.batch_size = batch_size
 
+        def __next__(self):
+            return self.next()
+
         def next(self):
             img_size = self.ds.img_size
             if self.__current_index >= self.ds.size:
@@ -75,7 +78,7 @@ class VehiclesMaskDataset(object):
     def __getitem__(self, item):
         if isinstance(item, slice):
             augmentation_scale = (1 + len(self.augmentations))
-            samples_slice = self.__vehicle_rows[item.start / augmentation_scale:item.stop / augmentation_scale]
+            samples_slice = self.__vehicle_rows[item.start // augmentation_scale:item.stop // augmentation_scale]
             return VehiclesMaskDataset(samples_slice, self.augmentations)
         else:
             raise IndexError('invalid index: ' + str(item))

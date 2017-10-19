@@ -20,10 +20,10 @@ dataset_names = ['sosnowiecka', 'smetna']
 ds = VehiclesMaskDataset.concat(map(lambda name: VehiclesMaskDataset.load_from_dir(name), dataset_names))
 ds = ds.shuffled()
 ds = ds.with_augmentations([flip_horizontally, stretch(80)])
-batch_size = 8
-train_dataset = ds[0:len(ds) * 80 / 100]
-valid_dataset = ds[len(ds) * 80 / 100:len(ds) * 90 / 100]
-test_dataset = ds[len(ds) * 90 / 100:-1]
+batch_size = 2
+train_dataset = ds[0:len(ds) * 80 // 100]
+valid_dataset = ds[len(ds) * 80 // 100:len(ds) * 90 // 100]
+test_dataset = ds[len(ds) * 90 // 100:-1]
 training_gen = train_dataset.generator(batch_size=batch_size)
 smooth = 1.
 model = small_unet((ds.img_rows, ds.img_cols))

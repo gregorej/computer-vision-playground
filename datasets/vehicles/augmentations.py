@@ -39,11 +39,11 @@ def perform_stretch(data_sample, scale_range=80):
     img = np.array(img, dtype=np.uint8)
 
     def stretch_bbox(bbox):
-        xmin = int((bbox[0] - p1[0])/(p2[0]-p1[0])*img.shape[1])
-        ymin = int((bbox[1] - p1[1])/(p3[1]-p1[1])*img.shape[0])
-        xmax = int((bbox[2] - p1[0])/(p2[0]-p1[0])*img.shape[1])
-        ymax = int((bbox[3] - p1[1])/(p3[1]-p1[1])*img.shape[0])
-        return (xmin, ymin, xmax, ymax)
+        xmin = int((bbox[0] - p1[0])//(p2[0]-p1[0])*img.shape[1])
+        ymin = int((bbox[1] - p1[1])//(p3[1]-p1[1])*img.shape[0])
+        xmax = int((bbox[2] - p1[0])//(p2[0]-p1[0])*img.shape[1])
+        ymax = int((bbox[3] - p1[1])//(p3[1]-p1[1])*img.shape[0])
+        return xmin, ymin, xmax, ymax
 
     bb_boxes_f = map(stretch_bbox, bb_boxes_f)
     return DataSample(img, bb_boxes_f)
@@ -52,7 +52,7 @@ def perform_stretch(data_sample, scale_range=80):
 def flip_horizontally(ds):
     bb_boxes = copy.deepcopy(ds.bb_boxes)
     _, width, _ = np.shape(ds.image)
-    middle = width / 2
+    middle = width // 2
     flip_x = lambda x: 2 * middle - x
     bb_boxes = map(lambda bbox: (
         flip_x(bbox[2]),
